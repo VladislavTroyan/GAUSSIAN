@@ -1,0 +1,262 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.golova {
+    display: flex;
+    background-color: #90ccf4;
+    color: #fff;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+    height: 100px;
+}
+
+#profileHeading {
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-size: 24px; /* Размер шрифта */
+    color: black;
+    position: relative;
+    cursor: pointer; /* Устанавливаем курсор в виде указателя */
+}
+
+.closeButton{
+    background-color: #90ccf4; /* синий цвет */
+    border: none;
+    color: black;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 5px; /* добавляем закругление углов */
+    transition: background-color 0.3s; /* Добавляем анимацию смены цвета фона */
+}
+.user-info {
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-size: 16px; /* Размер шрифта */
+    color: black;
+    flex-direction: column;
+    position: relative;
+}
+.user-button-contener {
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-size: 16px; /* Размер шрифта */
+    display: flex;
+    color: black;
+    flex-direction: column;
+    position: relative;
+}
+.user-button{
+    background-color: white; /* синий цвет */
+    border: none;
+    color: black;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 5px; /* добавляем закругление углов */
+}
+main {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+}
+
+.profile-section {
+    flex-grow: 1;
+    margin-right: 20px;
+}
+
+
+#errorList {
+    list-style: none;
+    padding: 0;
+}
+
+#errorList li {
+    color: #dc3545; /* Красный цвет для сообщений об ошибках */
+    margin-bottom: 5px;
+}
+
+
+
+
+
+#uploadError {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    color: #90ccf4;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: all 0.3s; /* Добавляем плавный переход для всех свойств */
+    border: 1px solid #90ccf4;
+    margin: 0 4px;
+    border-radius: 4px; /* Закругляем углы */
+    font-weight: normal; /* Увеличиваем жирность текста */
+}
+
+.pagination a.active {
+    background-color: #90ccf4;
+    color: white;
+    border: 1px solid #90ccf4; /* Убираем границу у активной кнопки */
+}
+
+.pagination a:hover:not(.active) {
+    background-color: #f0f0f0;
+    box-shadow: 0px 0px 10px 0px rgba(0, 123, 255, 0.5); /* Добавляем тень при наведении */
+    text-decoration: none; /* Убираем подчеркивание при наведении */
+}
+
+.pagination span.current {
+    padding: 8px 16px;
+    background-color: #90ccf4;
+    color: white;
+    border: 1px solid #90ccf4;
+    margin: 0 4px;
+    font-weight: bold;
+}
+
+
+
+.site-info {
+    display: flex;
+    align-items: center;
+}
+
+#siteHeading {
+    margin: 0;
+}
+
+
+
+main {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+}
+
+.profile-section {
+    flex-grow: 1;
+    margin-right: 20px;
+}
+
+
+#errorList {
+    list-style: none;
+    padding: 0;
+}
+
+#errorList li {
+    color: #dc3545; /* Красный цвет для сообщений об ошибках */
+    margin-bottom: 5px;
+}
+
+
+
+
+#uploadError {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    color: #90ccf4;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: all 0.3s; /* Добавляем плавный переход для всех свойств */
+    border: 1px solid #90ccf4;
+    margin: 0 4px;
+    border-radius: 4px; /* Закругляем углы */
+    font-weight: normal; /* Увеличиваем жирность текста */
+}
+
+.pagination a.active {
+    background-color: #90ccf4;
+    color: white;
+    border: 1px solid #90ccf4; /* Убираем границу у активной кнопки */
+}
+
+.pagination a:hover:not(.active) {
+    background-color: #f0f0f0;
+    box-shadow: 0px 0px 10px 0px rgba(0, 123, 255, 0.5); /* Добавляем тень при наведении */
+    text-decoration: none; /* Убираем подчеркивание при наведении */
+}
+
+.pagination span.current {
+    padding: 8px 16px;
+    background-color: #90ccf4;
+    color: white;
+    border: 1px solid #90ccf4;
+    margin: 0 4px;
+    font-weight: bold;
+}
+
+#uploadForm {
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+#fileInput {
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+
+.file-drop-area {
+    border: 2px dashed #90ccf4;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    cursor: pointer;
+}
+
+.file-drop-area.dragover {
+    background-color: #e8e8e8;
+}
+
+

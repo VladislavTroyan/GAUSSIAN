@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="ru" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация на сайте Gaussian</title>
+    <link rel="stylesheet" href="{% static 'css/registration.css' %}">
+   </head>
+<body>
+  <div class="wrapper">
+    <h2>Регистрация</h2>
+    <form action="{% url 'register' %}" method="post">
+      {% csrf_token %}
+
+      <div class="input-box">
+        <input type="text" name="{{ form.first_name.name }}" class="custom-input" placeholder="Введите имя" required>
+      </div>
+
+      <div class="input-box">
+        <input type="text" name="{{ form.last_name.name }}" class="custom-input" placeholder="Введите фамилию" required>
+      </div>
+
+      <div class="input-box">
+        <input type="text" name="{{ form.username.name }}" class="custom-input" placeholder="Введите имя пользователя" required>
+      </div>
+
+      <div class="input-box">
+        <input type="email" name="{{ form.email.name }}" class="custom-input" placeholder="Введите ваш Email" required>
+      </div>
+
+      <div class="input-box">
+        <input type="password" name="{{ form.password1.name }}" class="custom-input" placeholder="Создайте пароль" required>
+      </div>
+
+      <div class="input-box">
+        <input type="password" name="{{ form.password2.name }}" class="custom-input" placeholder="Подтвердите пароль" required>
+      </div>
+
+      <div class="input-box button">
+        <input type="submit" value="Зарегистрироваться">
+      </div>
+      {{ form.errors }}
+      <div class="text">
+        <h3>У вас уже есть аккаунт? <a href="{% url 'profile' %}">Войти здесь</a></h3>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

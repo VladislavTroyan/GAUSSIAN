@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <!-- Добавлены стили Bootstrap для уведомлений -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <header class="golova">
+        <div id="profileHeading">Database<br>Quantum chemical calculations</div> <!-- Исправлено опечатка в слове Quantum -->
+        <div id="user-button-container">
+            <!-- Исправлена опечатка в названии класса -->
+            <button class="user-button" onclick="location.href='{% url 'custom_password_change' %}'">Смена пароля</button><br>
+            <form id="out" method="post" action="{% url 'logout' %}?next={{ request.path }}">
+                {% csrf_token %}
+                <button class="user-button" onclick="location.href='{% url 'logout' %}?next={{ request.path|urlencode }}'">Выход из аккаунта</button>
+            </form>
+        </div>
+        <div class="user-info">
+            <div>
+                Имя, фамилия: {{ user.first_name }} {{ user.last_name }}<br>
+                Имя пользователя: {{ user.username }}<br>
+                Email пользователя: {{ user.email }}
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="profile-section">
+            {% if user.is_superuser or user.is_staff %}
+            <form id="uploadForm" class="upload-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div id="fileDropArea" class="file-drop-area">
+                    <input type="file" id="fileInput" name="fileInput" multiple class="file-input">
+                    <label for="fileInput" class="file-label">Перетащите файлы сюда или нажмите для выбора</label>
+                </div>
+                <button type="button" class="btn btn-primary profile-btn upload-button" onclick="uploadFiles()">Отправить</button>
+            </form>
+
+            <!-- Используем Bootstrap для стилизации уведомлений и прогресс-бара -->
+            <div class="progress">
+                <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+
+            <!-- Уведомление об ошибках и успешной загрузке -->
+            <div class="alert alert-danger" role="alert" id="errorMessageAlert" style="display: none;">
+                <strong>Ошибка!</strong><br>
+                <span id="errorMessageText"></span>
+            </div>
+            <div class="alert alert-success" role="alert" id="successMessageAlert" style="display: none;">
+                <strong>Успешно загружено:</strong><br>
+                <span id="successMessageText"></span>
+            </div>
+            <button id="closeButton" class="btn btn-secondary profile-btn" style="display: none;" onclick="closeAll()">Закрыть</button>
+
+            </div> <!-- Закрываем div.profile-section -->
+
+            <h2>История загрузки</h2>
+            <table id="uploadHistory" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Файл</th>
+                        <th>CAS</th>
+                        <th>Метод</th>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                        <th>Сообщение об ошибке</th> <!-- Новый столбец -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in page_obj %}
+                    <tr class="{% if item.type == 'error' %}error-row{% endif %}">
+                        <td>
+                            {% if item.type == 'upload' %}
+                                <!-- Отображаем имя файла для загрузок -->
+                                {{ item.original_filename }}
+                            {% else %}
+                                <!-- Отображаем имя файла для ошибок -->
+                                {{ item.filename }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ item.cas }}
+                        </td>
+                        <td>
+                            {% if item.type == 'upload' %}
+                                <!-- Отображаем name_method для загрузок -->
+                                {{ item.name_method }}
+                            {% else %}
+                                <!-- Для ошибок не предполагается выводить name_method, можно оставить пустым -->
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.type == 'upload' %}
+                                <!-- Отображаем дату загрузки для загрузок -->
+                                {{ item.uploaded_at|date:"Y-m-d H:i:s" }}
+                            {% else %}
+                                <!-- Отображаем дату создания для ошибок -->
+                                {{ item.created_at|date:"Y-m-d H:i:s" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.type == 'upload' %}
+                                <!-- Отображаем статус для загрузок -->
+                                {% if item.processed_successfully %}
+                                    <span class="text-success">Успешно</span>
+                                {% else %}
+                                    <span class="text-danger">Ошибка</span>
+                                {% endif %}
+                            {% else %}
+                                <!-- Отображаем статус для ошибок -->
+                                {% if item.processed_successfully %}
+                                    <span class="text-success">Успешно</span>
+                                {% else %}
+                                    <span class="text-danger">Ошибка</span>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.type == 'error' %}
+                                <!-- Отображаем сообщение об ошибке для ошибок -->
+                                {{ item.error_message }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; первая</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
+                    {% endif %}
+
+                    <span class="current">
+                        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">следующая</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+
+            {% else %}
+            <p>Вы не имеете доступа к загрузке.</p>
+            {% endif %}
+        </div> <!-- Закрываем div.pagination -->
+
+        <!-- Ваш HTML-код для вывода данных -->
+
+        <!-- Добавим скрипт для перенаправления на главную при клике на "Профиль пользователя" -->
+        <script>
+            document.getElementById('profileHeading').addEventListener('click', function() {
+                window.location.href = '{% url 'homepage' %}';
+            });
+        </script>
+
+        <script>
+            const fileDropArea = document.getElementById('fileDropArea');
+
+            fileDropArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                fileDropArea.classList.add('dragover');
+            });
+
+            fileDropArea.addEventListener('dragenter', function(e) {
+                e.preventDefault();
+                fileDropArea.classList.add('dragover');
+            });
+
+            fileDropArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                fileDropArea.classList.remove('dragover');
+            });
+
+            fileDropArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                fileDropArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                document.getElementById('fileInput').files = files;
+            });
+
+            // Создаем словарь с описаниями ошибок
+            const errorDescriptions = {
+                1: 'Незавершённый расчёт.',
+                2: 'Нет CAS.',
+                3: 'Неизвестный метод.',
+                4: 'Расчёт уже есть в базе.',
+                5: 'Неизвестная ошибка. Пожалуйста, повторите попытку позже или обратитесь к администратору.'
+            };
+
+            async function uploadFiles() {
+                const fileInput = document.getElementById('fileInput');
+                const progressBar = document.getElementById('progressBar');
+                const errorMessageAlert = document.getElementById('errorMessageAlert');
+                const errorMessageText = document.getElementById('errorMessageText');
+                const successMessageText = document.getElementById('successMessageText');
+                const closeButton = document.getElementById('closeButton');
+
+                // Сброс прогресса перед началом загрузки нового файла
+                progressBar.style.width = '0%';
+                progressBar.textContent = '0%';
+
+                const formData = new FormData();
+
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                const files = fileInput.files;
+
+                if (files.length === 0) {
+                    errorMessageText.textContent = 'Выберите хотя бы один файл для загрузки.';
+                    errorMessageAlert.style.display = 'block';
+                    return;
+                }
+
+                for (let i = 0; i < files.length; i++) {
+                    formData.append('fileInput', files[i]);
+                }
+
+                try {
+                    const xhr = new XMLHttpRequest();
+
+                    // Событие отслеживания прогресса загрузки
+                    xhr.upload.addEventListener('progress', function(event) {
+                        if (event.lengthComputable) {
+                            const percentComplete = (event.loaded / event.total) * 100;
+                            progressBar.style.width = percentComplete + '%';
+                            progressBar.textContent = percentComplete.toFixed(2) + '%';
+                        }
+                    });
+
+                    xhr.open('POST', '{% url "upload_files" %}');
+                    xhr.send(formData);
+
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            if (xhr.status === 200) {
+                                const result = JSON.parse(xhr.responseText);
+                                console.log(result.errors);
+
+                                // Обработка ошибок
+                                if (result.errors && result.errors.length > 0) {
+                                    let errorMessages = result.errors.map(error => {
+                                        let errorMessage = error.error_message ? error.error_message : (errorDescriptions[error.error_type] || "");
+                                        return `Файл: <span style="font-weight: bold;">${error.file_name}</span>, ${errorMessage}`;
+                                    });
+                                    errorMessageText.innerHTML = errorMessages.join('<br>');
+                                    errorMessageAlert.style.display = 'block';
+                                } else {
+                                    errorMessageAlert.style.display = 'none'; // Скрываем уведомление об ошибке, если нет ошибок
+                                }
+
+                                // Обработка успешно загруженных файлов
+                                if (result.success_files && result.success_files.length > 0) {
+                                    result.success_files.forEach(success_file => {
+                                        let fileElement = document.createElement('div');
+                                        fileElement.innerHTML = `Файл: <strong>${success_file.file_name}</strong>`;
+                                        fileElement.classList.add('text-success'); // Добавляем класс для зеленого цвета
+                                        successMessageText.appendChild(fileElement);
+                                    });
+                                    successMessageAlert.style.display = 'block'; // Показываем уведомление об успешной загрузке
+                                } else {
+                                    successMessageAlert.style.display = 'none'; // Скрываем уведомление об успешной загрузке, если нет успешных файлов
+                                }
+
+
+                                // Показываем кнопку "Закрыть"
+                                closeButton.style.display = 'inline-block';
+                            } else {
+                                throw new Error(`Server responded with status ${xhr.status}`);
+                            }
+                        }
+                    };
+
+                } catch (error) {
+                    console.error('Error during file upload:', error);
+                    errorMessageText.textContent = 'Произошла ошибка при загрузке файлов. Пожалуйста, попробуйте еще раз.';
+                    errorMessageAlert.style.display = 'block';
+                }
+            }
+
+            function closeAll() {
+                // Очищаем уведомление об ошибке при закрытии
+                const errorMessageAlert = document.getElementById('errorMessageAlert');
+                const errorMessageText = document.getElementById('errorMessageText');
+                errorMessageText.textContent = '';
+                errorMessageAlert.style.display = 'none'; // Скрываем уведомление об ошибке
+
+                // Очищаем уведомление об успешной загрузке при закрытии
+                const successMessageAlert = document.getElementById('successMessageAlert');
+                const successMessageText = document.getElementById('successMessageText');
+                successMessageText.textContent = '';
+                successMessageAlert.style.display = 'none'; // Скрываем уведомление об успешной загрузке
+
+                const closeButton = document.getElementById('closeButton');
+                closeButton.style.display = 'none';
+            }
+        </script>
+    </body>
+</html>

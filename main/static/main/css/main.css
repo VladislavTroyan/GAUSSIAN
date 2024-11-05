@@ -1,0 +1,842 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Montserrat Alternates', sans-serif;
+}
+body {
+    background-color: #F9FAFE;/* Цвет фона */
+}
+
+/* ШАПКА */
+header {
+    position: fixed;
+    background-color: #90ccf4; /* Цвет фона */
+    color: #fff; /* Цвет текста */
+    padding: 10px; /* Внутренний отступ */
+    display: flex; /* Размещение элементов в строку */
+    justify-content: space-between; /* Равномерное распределение элементов по ширине */
+    align-items: center; /* Выравнивание по центру по вертикали */
+    height: 80px; /* Задаем высоту шапки */
+    width: 100%;
+    z-index: 10001;
+}
+#golova{
+    height: 80px; /* Задаем высоту шапки */
+    width: 100%;
+}
+
+/* Стили для заголовка */
+#title {
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-size: 24px; /* Размер шрифта */
+    color: black;
+    cursor: pointer; /* Устанавливаем курсор в виде указателя */
+}
+
+/* Стили для формы поиска */
+#search-line {
+    align-items: center; /* Выравнивание по центру по вертикали */
+    position: relative;
+    display: flex;
+}
+
+#search_query {
+    border-radius: 8px; /* Радиус скругления углов */
+    border: none; /* Обводка */
+    width: 500px;
+    height: 55px;
+    flex: 1;
+    position: relative;
+    padding-right: 30px; /* Добавляем отступ справа для размещения кнопки */
+}
+/* Стиль текста внутри строки */
+#search_query::placeholder {
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-size: 18px; /* Размер шрифта */
+    color: #999; /* Цвет текста placeholder */
+}
+/* Стилизация введённого пользователем текста */
+#search_query:valid {
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-size: 18px; /* Размер шрифта */
+    color: black; /* Цвет текста, когда введённый текст валиден */
+}
+
+#search_query:invalid {
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-size: 18px; /* Размер шрифта */
+    color: #f76c6c; /* Цвет текста, когда введённый текст не валиден */
+}
+
+/* Удаление обводки при нажатии */
+#search_query:focus,
+.CASForm-button:focus {
+    outline: none;
+}
+/* Размытие по краям после нажатия */
+#search-line:focus-within {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Размытая обводка при фокусе внутри #search-line */
+    border-radius: 8px;
+}
+
+.CASForm-button {
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    transition: background-color 0.3s; /* Добавляем анимацию смены цвета фона */
+    border-radius: 8px; /* Задаем радиус скругления краев */
+    margin: auto 10px auto auto;
+}
+#search-button {
+    width: 25px; /* Ширина элемента сравнения */
+    height: 25px; /* Высота элемента сравнения */
+    background-color: transparent; /* Цвет фона элемента сравнения */
+    background-image: url('/media/photos/serach.png'); /* Путь к изображению */
+    background-size: contain; /* Изображение полностью помещается в кнопку */
+    margin: 0 auto; /* Выравнивание по центру по горизонтали */
+}
+/* Стиль кнопок при наведении */
+.CASForm-button:hover {
+    background-color: rgba(0, 0, 0, 0.2); /* Чёрный с прозрачностью 0.2 при наведении */
+}
+
+
+
+/* Контейнер с кнопками */
+#button-head{
+    display: flex;
+    width: 400px; /* Ширина элемента сравнения */
+    justify-content: space-between; /* Равномерное распределение элементов по ширине */
+}
+/* Стиль кнопок */
+.header-button-text {
+    width: 99px;
+    height: 55px;
+    position: relative;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    margin: 0 auto;
+    transition: background-color 0.3s; /* Добавляем анимацию смены цвета фона */
+    border-radius: 8px; /* Задаем радиус скругления краев */
+}
+/* Стиль кнопок при наведении */
+.header-button-text:hover {
+    background-color: rgba(0, 0, 0, 0.2); /* Чёрный с прозрачностью 0.2 при наведении */
+}
+/* Цвет текста */
+.name-button {
+    color: black; /* Устанавливаем цвет текста */
+    font-size: 14px; /* Устанавливаем размер текста */
+    font-family: 'Montserrat Alternates', sans-serif;
+}
+/* Картинки в кнопках (каждая кнопка по отдельности) */
+#comparison {
+    width: 20px; /* Ширина элемента сравнения */
+    height: 20px; /* Высота элемента сравнения */
+    background-color: transparent; /* Цвет фона элемента сравнения */
+    background-image: url('/media/photos/comparison.png'); /* Путь к изображению */
+    background-size: contain; /* Изображение полностью помещается в кнопку */
+    margin: 0 auto; /* Выравнивание по центру по горизонтали */
+}
+#favorites{
+    width: 20px; /* Ширина элемента сравнения */
+    height: 20px; /* Высота элемента сравнения */
+    background-color: transparent; /* Цвет фона элемента сравнения */
+    background-image: url('/media/photos/favorites.png'); /* Путь к изображению */
+    background-size: contain; /* Изображение полностью помещается в кнопку */
+    margin: 0 auto; /* Выравнивание по центру по горизонтали */
+
+}
+#entry{
+    width: 20px; /* Ширина элемента сравнения */
+    height: 20px; /* Высота элемента сравнения */
+    background-color: transparent; /* Цвет фона элемента сравнения */
+    background-image: url('/media/photos/profile.png'); /* Путь к изображению */
+    background-size: contain; /* Изображение полностью помещается в кнопку */
+    margin: 0 auto; /* Выравнивание по центру по горизонтали */
+}
+
+.header-button-text-entered {
+    width: auto;
+    height: 55px;
+    position: relative;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    margin: 0 auto;
+    transition: background-color 0.3s; /* Добавляем анимацию смены цвета фона */
+    border-radius: 8px; /* Задаем радиус скругления краев */
+}
+#profile{
+    width: 20px; /* Ширина элемента сравнения */
+    height: 20px; /* Высота элемента сравнения */
+    background-color: transparent; /* Цвет фона элемента сравнения */
+    background-image: url('/media/photos/profile.png'); /* Путь к изображению */
+    background-size: contain; /* Изображение полностью помещается в кнопку */
+    margin: 0 auto; /* Выравнивание по центру по горизонтали */
+}
+.header-button-text-entered:hover {
+    background-color: rgba(0, 0, 0, 0.2); /* Чёрный с прозрачностью 0.2 при наведении */
+}
+
+
+
+#auth-message-container {
+    display: none;
+    background-color: #73A3C3;
+    border: none;
+    width: 100%;
+    top: 300px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    text-align: center;
+}
+
+#auth-message-container-text {
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-size: 16px; /* Размер шрифта */
+    color: black;
+}
+#auth-message-container-text p {
+    margin: 0;
+    padding: 0;
+}
+
+
+
+
+/* ТАБЛИЦЫ   СЮДА*/
+/* Инфа о молекуле */
+.result-container {
+    float: right; /* Выравниваем справа */
+    width: 72%; /* Занимает 72% ширины экрана */
+    border: 1px solid #000000;
+    border-radius: 8px;
+    margin: 50px 10px 30px 0!important; /* Верх, право, низ, лево */
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    background-color: white;/* Цвет фона */
+
+}
+
+.table-image{
+    width: 20px;
+    height: 20px;
+    padding: 2px;
+}
+
+.result-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 16px;
+    width: 100%;
+}
+
+.result-text div {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.result-text span {
+    font-weight: normal;
+    color: #333;
+    margin-left: 5px;
+}
+
+
+/* ЧЕКБОКСЫ РЕЗУЛЬТАТА ПОИСКА МОЛЕКУЛ!!!!!! */
+.checkbox.style-f {
+    display: inline-block;
+    top: -64px; /* Верхний отступ */
+    right: -7px; /* Правый отступ */
+    position: relative;
+    padding: 10px; /* Убираем отступ слева */
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    text-align: center; /* Центрируем текст */
+}
+
+.checkbox.style-f input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+.checkbox.style-f input:checked ~ .checkbox__checkmark {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.checkbox.style-f input:checked ~ .checkbox__checkmark:after {
+    transform: scale(1);
+}
+.checkbox.style-f input:checked ~ .checkbox__body {
+    font-weight: bold;
+}
+.checkbox.style-f:hover input ~ .checkbox__checkmark {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.checkbox.style-f:hover input:checked ~ .checkbox__checkmark {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.checkbox.style-f .checkbox__checkmark {
+    position: relative;
+    display: block; /* Ensure block display to make vertical alignment */
+    margin: 0 auto; /* Центрируем чекбокс */
+    height: 22px;
+    width: 22px;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: background-color 0.25s ease;
+    border-radius: 11px;
+}
+
+.checkbox.style-f .checkbox__checkmark:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 22px;
+    height: 22px;
+    display: block;
+    background-color: #f7cb15;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.25s ease;
+}
+.checkbox.style-f .checkbox__body {
+    color: #333;
+    line-height: 1.4;
+    font-size: 11px;
+    transition: font-weight 0.25s ease;
+    margin-top: 5px;
+    white-space: nowrap; /* Запрещаем перенос текста */
+}
+
+
+/* ЧЕКБОКСЫ РЕЗУЛЬТАТА ФИЛЬТРАЦИ!!!!!!  СЮДА */
+.checkbox.style-f2 {
+    display: inline-block;
+    position: absolute; /* Изменяем на absolute */
+    /* Далее вы можете убрать свойства top и right, чтобы чекбокс располагался относительно верхнего левого угла контейнера .plitki */
+    padding: 10px;
+    cursor: pointer;
+    right: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    text-align: center;
+    z-index: 1000;
+}
+
+.checkbox.style-f2 input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+.checkbox.style-f2 input:checked ~ .checkbox__checkmark {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.checkbox.style-f2 input:checked ~ .checkbox__checkmark:after {
+    transform: scale(1);
+}
+.checkbox.style-f2 input:checked ~ .checkbox__body {
+    font-weight: bold;
+}
+.checkbox.style-f2:hover input ~ .checkbox__checkmark {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.checkbox.style-f2:hover input:checked ~ .checkbox__checkmark {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.checkbox.style-f2 .checkbox__checkmark {
+    position: relative;
+    display: block; /* Ensure block display to make vertical alignment */
+    margin: 0 auto; /* Центрируем чекбокс */
+    height: 22px;
+    width: 22px;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: background-color 0.25s ease;
+    border-radius: 11px;
+}
+
+.checkbox.style-f2 .checkbox__checkmark:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 22px;
+    height: 22px;
+    display: block;
+    background-color: #f7cb15;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.25s ease;
+}
+.checkbox.style-f2 .checkbox__body {
+    color: #333;
+    line-height: 1.4;
+    font-size: 11px;
+    transition: font-weight 0.25s ease;
+    margin-top: 5px;
+    white-space: nowrap; /* Запрещаем перенос текста */
+}
+
+
+.result-image {
+    width: 25%;
+    height: auto;
+    margin-right: 30px;
+    border-radius: 8px;
+    border: 1px solid #000000;
+}
+
+
+/* Кнопки показа таблиц */
+.toggle-buttons-container {
+    margin: 0 10px 0 0 !important; /* Верх, право, низ, лево */
+    display: flex;
+    float: right; /* Выравниваем справа */
+    width: 72%; /* Занимает 50% ширины экрана */
+    justify-content: flex-start; /* Равномерно распределяет кнопки по контейнеру */
+}
+
+.toggleButton {
+    margin: 0 15px 0 6px !important; /* Верх, право, низ, лево */
+    padding: 5px 10px; /* Отступы внутри кнопки */
+    background-color: #90ccf4; /* Белый фон кнопки */
+    color: black; /* Синий цвет текста на кнопке */
+    border: none; /* Границы кнопки */
+    border-radius: 5px; /* Скругляем углы кнопки */
+    cursor: pointer; /* Устанавливаем курсор в виде указателя */
+    display: inline-block; /* Размещаем кнопки в строку */
+    transition: background-color 0.3s; /* Добавляем анимацию смены цвета фона */
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-weight: bold;
+}
+
+
+/* При наведении добавляем эффект обводки */
+.toggleButton:hover {
+    background-color: #73A3C3; /* Чёрный с прозрачностью 0.2 при наведении */
+}
+
+/* Таблицы */
+.toggle-table {
+    display: none; /* Меняем display на block */
+    float: right; /* Выравниваем справа */
+    width: 74%; /* Занимает 50% ширины экрана */
+    border-collapse: collapse;
+    margin: 0 10px 0 0!important; /* Верх, право, низ, лево */
+}
+
+.toggle-table th,
+.toggle-table td {
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.toggle-table th {
+    background-color: #f2f2f2;
+}
+
+.toggle-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.toggle-table tr:hover {
+    background-color: #f2f2f2;
+}
+
+
+/* Кнопки внутри таблицы  СЮДА */
+.action-button {
+    background-color: #90ccf4; /* синий цвет */
+    color: black;
+    display: inline-block;
+    margin: 3px;
+    transition-duration: 0.3s;
+    cursor: pointer;
+    border-radius: 5px; /* добавляем закругление углов */
+    border: none;
+    transition: background-color 0.3s; /* Добавляем анимацию смены цвета фона */
+}
+
+.action-button:hover {
+    background-color: #73A3C3; /* Чёрный с прозрачностью 0.2 при наведении */
+}
+
+
+/* ФИЛЬТР */
+/* Стили для меню */
+/* Стили для контейнера с результатом */
+/* Стили для кнопок и контейнеров */
+.menu {
+    position: fixed;
+    background-color: #ffffff;
+    padding: 10px;
+    left: 0;
+    width: 16%;
+    height: 77%;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    top: 130px;
+    z-index: 9999;
+    margin: 0 0 0 30px; /* Верх, право, низ, лево */
+    font-family: 'Calibri', sans-serif;
+    font-size: 16px; /* Размер шрифта */
+}
+#reset-filters {
+    background-color: #90ccf4; /* синий цвет */
+    font-family: 'Montserrat Alternates', sans-serif;
+    border: none;
+    color: black;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 2px 0; /* Уменьшенные внешние отступы между элементами */
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 5px; /* добавляем закругление углов */
+    transition: background-color 0.3s; /* Добавляем анимацию смены цвета фона */
+    width: calc(100% - 4px); /* Фиксируем ширину, учитывая padding */
+}
+
+#reset-filters:hover {
+    background-color: #73A3C3; /* Чёрный с прозрачностью 0.2 при наведении */
+}
+.button-menu {
+    background-color: #90ccf4; /* синий цвет */
+    font-family: 'Montserrat Alternates', sans-serif;
+    border: none;
+    color: black;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 2px 0; /* Уменьшенные внешние отступы между элементами */
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 5px; /* добавляем закругление углов */
+    width: calc(100% - 4px); /* Фиксируем ширину, учитывая padding */
+}
+.button-menu.active {
+    background-color: #73A3C3; /* Темнее синего цвета #007bff */
+}
+
+/* Стили для контейнера метки и чекбокса */
+.l-favorites-checkbox1 {
+    background-color: #90ccf4;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 1px 4px;
+    margin: 2px 0;
+    width: calc(100% - 8px);
+    box-sizing: border-box;
+    border-radius: 5px;
+    transition: background-color 0.3s; /* Плавный переход цвета фона */
+}
+
+
+/* Стили для групп элементов */
+.l-submenu-checkbox {
+    cursor: pointer; /* Устанавливаем курсор в виде указателя */
+    display: flex;
+    align-items: center;
+    padding: 1px 4px; /* Уменьшенные внутренние отступы для более компактного расположения */
+    margin: 2px 0; /* Уменьшенные внешние отступы между элементами */
+    background-color: transparent; /* Начальный цвет фона */
+    width: calc(100% - 8px); /* Фиксируем ширину, учитывая padding */
+    box-sizing: border-box; /* Включаем padding и border в ширину и высоту элемента */
+    border-radius: 5px; /* Добавляем скругленные углы */
+}
+
+.l-submenu-checkbox input[type="checkbox"] {
+    margin-right: 5px; /* Отступ между чекбоксом и текстом */
+}
+
+.l-submenu-checkbox:hover {
+    background-color: #73A3C3; /* Цвет фона при наведении */
+}
+
+.l-submenu-checkbox:hover label {
+    color: #fff; /* Цвет текста при наведении */
+}
+
+
+/* Скрыть фильтр молекул по умолчанию */
+#filtter-mol {
+    display: none;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Стили для контейнера каждой пары метка-поле */
+.field-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+/* Стили для меток */
+.l-submenu-number {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+    text-align: right;
+    margin-right: 5px;
+    width: 30px; /* Фиксированная ширина для меток */
+}
+
+/* Стили для полей ввода */
+.submenu-number {
+    width: 50px;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.submenu-number:focus {
+    border-color: #73A3C3;
+    outline: none;
+}
+
+
+
+
+#resultContainer1 {
+    position: fixed;
+    top: 130px;
+    right: 30px;
+    left: calc(16% + 43px);
+    z-index: 9999;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    border-left: 1px #00000000; /* прозрачная левая граница */
+    padding: 10px;
+    overflow-y: auto;
+    height: 77%;
+    display: none;
+    border-top-right-radius: 10px; /* белое левое верхнее скругление */
+    border-bottom-right-radius: 10px; /* белое левое нижнее скругление */
+}
+
+#resultContainer1::-webkit-scrollbar {
+    width: 10px; /* Ширина скроллбара */
+}
+
+#resultContainer1::-webkit-scrollbar-thumb {
+    background-color: #666; /* Цвет ползунка */
+    border-radius: 10px; /* Скругление углов ползунка */
+}
+
+#resultContainer1::-webkit-scrollbar-track {
+    background-color: #f0f0f0; /* Цвет трека скроллбара */
+    border-radius: 10px; /* Скругление углов трека */
+    min-height: 20px; /* Минимальная высота трека */
+}
+
+/* Стрелки для вертикального скроллбара */
+#resultContainer1::-webkit-scrollbar-button:start:decrement,
+#resultContainer1::-webkit-scrollbar-button:end:increment {
+    background-color: transparent; /* Прозрачный фон */
+    border-radius: 10px; /* Скругление углов */
+    background-size: 10px; /* Размер изображения */
+    background-repeat: no-repeat; /* Не повторять изображение */
+}
+
+/* Стрелки для горизонтального скроллбара */
+#resultContainer1::-webkit-scrollbar-button:horizontal:start:decrement,
+#resultContainer1::-webkit-scrollbar-button:horizontal:end:increment {
+    background-color: transparent; /* Прозрачный фон */
+    border-radius: 10px; /* Скругление углов */
+    background-size: 10px; /* Размер изображения */
+    background-repeat: no-repeat; /* Не повторять изображение */
+}
+
+/* Стили для изображений стрелок */
+#resultContainer1::-webkit-scrollbar-button:start:decrement {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="#666" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 19l-9-9 9-9 1.414 1.414-7.586 7.586L12 18.586z"/></svg>'); /* Стрелка влево или вверх */
+}
+
+#resultContainer1::-webkit-scrollbar-button:end:increment {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="#666" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 5l9 9-9 9-1.414-1.414 7.586-7.586L12 6.414z"/></svg>'); /* Стрелка вправо или вниз */
+}
+
+/* Изображение стрелки при наведении */
+#resultContainer1::-webkit-scrollbar-button:hover {
+    background-color: #999; /* Цвет при наведении */
+}
+
+
+.result-filtr {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.plitki {
+    height: 356px; /* Установка высоты элемента */
+    position: relative;
+    flex-basis: calc(25% - 20px); /* Рассчитываем ширину элемента с учетом отступов */
+    margin: 10px; /* Равномерный отступ со всех сторон */
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    border-radius: 10px; /* Закругление углов */
+    display: flex; /* Используем flexbox */
+    flex-direction: column; /* Столбцовая ориентация для дочерних элементов */
+    justify-content: space-between;
+    z-index: 9998;
+}
+.result-image2 {
+    width: 100%;
+    display: inline-block;
+    height: 160px;
+    border-radius: 8px;
+    padding-top: 40px;
+    background-color: white;
+    /*border: 1px solid #000000;*/
+    justify-content: flex-start; /* Выравнивание по горизонтали (если требуется)СЮДА */
+    align-items: flex-start;
+    margin-left: -1px;
+}
+.text-infa {
+    width: 100%;
+    height: 136px;
+    border-radius: 8px;
+    /*border: 1px solid #000000;*/
+    max-height: 40%;
+    margin-left: -1px;
+    display: flex; /* Используем Flexbox */
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    flex-direction: column; /* Располагаем div-ы в столбик */
+}
+
+.plitki-button {
+    position: relative; /* Для позиционирования псевдоэлемента */
+    height: 100%; /* Установка высоты равной 100% от родительского элемента */
+    background-color: transparent; /* Прозрачный фон */
+    border: none; /* Убираем границу */
+    border-radius: 10px; /* Закругление углов */
+    z-index: 999;
+    font-family: 'Calibri', sans-serif;
+    font-size: 16px; /* Размер шрифта */
+}
+
+.plitki-button::after {
+    content: ''; /* Добавляем содержимое для псевдоэлемента */
+    position: absolute; /* Абсолютное позиционирование */
+    top: 0; /* Располагаем вверху */
+    left: 0; /* Располагаем слева */
+    right: 0; /* Располагаем справа */
+    bottom: 0; /* Располагаем внизу */
+    border-radius: inherit; /* Наследование закругления углов */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Тень */
+    opacity: 0; /* Начальная непрозрачность */
+    transition: opacity 0.3s; /* Плавное изменение непрозрачности */
+}
+
+.plitki-button:hover::after {
+    opacity: 1; /* Сделать псевдоэлемент полностью непрозрачным при наведении */
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2); /* Затемненный фон с прозрачностью 0.5 */
+    display: none; /* Начально скрыт */
+    z-index: 9998; /* Ниже z-index контейнера результатов */
+}
+
+
+
+
+
+
+
+
+
+.checkbox-wrapper-49 {
+    margin: 0 0 7px 0; /* Верх, право, низ, лево */
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-wrapper-49 .switch {
+  display: inline-block;
+  height: 26px;
+  position: relative;
+  width: 52px;
+  margin-right: 10px; /* Add some space between the slider and the text */
+}
+
+.checkbox-wrapper-49 .switch input {
+  display: none;
+}
+
+.checkbox-wrapper-49 .slider {
+  background-color: rgba(0, 0, 0, 0.2);
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: .4s;
+}
+
+.checkbox-wrapper-49 .slider:before {
+  background-color: #fff;
+  bottom: 4px;
+  content: "";
+  height: 18px;
+  left: 4px;
+  position: absolute;
+  transition: .4s;
+  width: 18px;
+}
+
+.checkbox-wrapper-49 input:checked + .slider {
+  background-color: #f7cb15;
+}
+
+.checkbox-wrapper-49 input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.checkbox-wrapper-49 .slider.round {
+  border-radius: 34px;
+}
+
+.checkbox-wrapper-49 .slider.round:before {
+  border-radius: 50%;
+}
+
+.checkbox-wrapper-49 .checkbox-text {
+  display: inline-block;
+}
+

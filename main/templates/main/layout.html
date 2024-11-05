@@ -1,0 +1,736 @@
+<!doctype html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}</title>
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+    <link href="https://fonts.cdnfonts.com/css/montserrat-alternates" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/montserrat" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/knewave" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/times-new-roman" rel="stylesheet">
+</head>
+<body>
+
+<!-- ШАПКА -->
+    <header>
+    <!-- ТЕКСТ В ШАПКЕ -->
+        <div id="title" onclick="location.reload();">Database<br>Quantum chemical calculations</div>
+
+    <!-- ПОИСКОВАЯ СТРОКА -->
+        <form id="CASForm" onsubmit="return submitForm(this)">
+            <div id = "search-line">
+                <input type="text" id="search_query" placeholder="Введите CAS" pattern="[0-9\-\s]+" title="Только цифры и дефисы. Пример: 123-45-6" maxlength="17">
+                <span></span>
+                <button class="CASForm-button" type="submit">
+                    <div id="search-button"></div>
+                </button>
+            </div>
+        </form>
+
+
+    <!-- ССЫЛКА В СРАВНЕНИЕ (ВРЕМЕННАЯ) -->
+    <div id = "button-head">
+        <button class = header-button-text>
+            <div id="comparison"></div>
+            <div class = "name-button"> Сравнение </div>
+        </button>
+
+
+
+    <!-- ССЫЛКА В ПРОФИЛЬ -->
+        {% if user.is_authenticated %}
+        <button class = header-button-text-entered onclick="window.location.href='{% url 'profile' %}'">
+            <div id="profile"></div>
+            <div class = "name-button"> {{ user.first_name }} {{ user.last_name }} </div>
+        </button>
+            {% if user.is_staff or user.is_superuser %}
+            <script>
+                var isStuff = true;
+            </script>
+            {% endif %}
+        {% else %}
+        <button class = header-button-text onclick="window.location.href='{% url 'profile' %}'">
+            <div id="entry"></div>
+            <div class = "name-button"> Войти </div>
+        </button>
+        {% endif %}
+    </div>
+
+
+
+    </header>
+    <div id="golova"></div>
+    <div id="overlay"></div>
+    <div id="userIdValue" data-userid="{{ user.id }}"></div>
+
+<!-- ФИЛЬТРАЦИЯ -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <form method="post" id="Filtration">
+        {% csrf_token %}
+        <div id="menu" class="menu">
+            <div class="checkbox-wrapper-49">
+              <label class="switch" for="cheap-49">
+                <input id="cheap-49" type="checkbox" name="0" class="submenu-checkbox" />
+                <div class="slider round"></div>
+              </label>
+              <span class="checkbox-text">Только избранное</span>
+            </div>
+            <button type="button" id="button-filtter-group" class="button-menu">Фильтрация по группам</button><br>
+            <div id="filtter-group">
+                <label class="l-submenu-checkbox"><input type="checkbox" name="1" class="submenu-checkbox"> Карбоксильная </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="2" class="submenu-checkbox"> Альдегидная </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="3" class="submenu-checkbox"> Карбонильная </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="4" class="submenu-checkbox"> Гидроксильная </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="5" class="submenu-checkbox"> Аминогруппа </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="16" class="submenu-checkbox"> Аминогруппа ароматического кольца </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="6" class="submenu-checkbox"> Нитрогруппа </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="7" class="submenu-checkbox"> Хлор </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="8" class="submenu-checkbox"> Бром </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="9" class="submenu-checkbox"> Фтор </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="10" class="submenu-checkbox"> Йод </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="11" class="submenu-checkbox"> Тиоловая </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="12" class="submenu-checkbox"> Эфирная </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="13" class="submenu-checkbox"> Сложноэфирная </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="14" class="submenu-checkbox"> Сульфогруппа </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="15" class="submenu-checkbox"> Цикл </label>
+                <label class="l-submenu-checkbox"><input type="checkbox" name="17" class="submenu-checkbox"> Цикл ароматический </label>
+            </div>
+            <button type="button" id="button-filtter-mol" class="button-menu">Выбрать число атомов</button><br>
+            <div id="filtter-mol">
+                <div class="field-container">
+                    <label class="l-submenu-number" for="F">F:</label>
+                    <input type="number" id="F" name="F" class="submenu-number" min="0" max="99" oninput="preventEmptyInput(this)">
+                </div>
+
+                <div class="field-container">
+                    <label class="l-submenu-number" for="Cl">Cl:</label>
+                    <input type="number" id="Cl" name="Cl" class="submenu-number" min="0" max="99" oninput="preventEmptyInput(this)">
+                </div>
+
+                <div class="field-container">
+                    <label class="l-submenu-number" for="O">O:</label>
+                    <input type="number" id="O" name="O" class="submenu-number" min="0" max="99" oninput="preventEmptyInput(this)">
+                </div>
+
+                <div class="field-container">
+                    <label class="l-submenu-number" for="C">C:</label>
+                    <input type="number" id="C" name="C" class="submenu-number" min="0" max="99" oninput="preventEmptyInput(this)">
+                </div>
+
+                <div class="field-container">
+                    <label class="l-submenu-number" for="Br">Br:</label>
+                    <input type="number" id="Br" name="Br" class="submenu-number" min="0" max="99" oninput="preventEmptyInput(this)">
+                </div>
+
+                <div class="field-container">
+                    <label class="l-submenu-number" for="H">H:</label>
+                    <input type="number" id="H" name="H" class="submenu-number" min="0" max="99" oninput="preventEmptyInput(this)">
+                </div>
+
+                <div class="field-container">
+                    <label class="l-submenu-number" for="N">N:</label>
+                    <input type="number" id="N" name="N" class="submenu-number" min="0" max="99" oninput="preventEmptyInput(this)">
+                </div>
+
+                <div class="field-container">
+                    <label class="l-submenu-number" for="S">S:</label>
+                    <input type="number" id="S" name="S" class="submenu-number" min="0" max="99" oninput="preventEmptyInput(this)">
+                </div>
+
+                <div class="field-container">
+                    <label class="l-submenu-number" for="I">I:</label>
+                    <input type="number" id="I" name="I" class="submenu-number" min="0" max="99" oninput="preventEmptyInput(this)">
+                </div>
+            </div>
+
+            <button type="button" id="reset-filters">Сбросить все фильтры</button><br>
+        </div>
+    </form>
+        <div id="resultContainer1"></div>
+    <div id="auth-message-container">
+        <div id="auth-message-container-text">
+            <p> Чтобы просмотреть результаты расчётов, пожалуйста, войдите в профиль.</p>
+        </div>
+    </div>
+    <div id="results">    </div>
+
+        {% block start %}
+        {% endblock %}
+
+<!-- СКРИПТЫ -->
+    <!-- ПОКАЗ И СКРИТИЕ ТИПОВ ФИЛЬТРАЦИИ -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var buttons = document.querySelectorAll(".button-menu");
+    var buttonFiltterGroup = document.getElementById("button-filtter-group");
+    var buttonFiltterMol = document.getElementById("button-filtter-mol");
+    var filtterGroup = document.getElementById("filtter-group");
+    var filtterMol = document.getElementById("filtter-mol");
+
+    buttons.forEach(function(button) {
+        button.addEventListener("click", function() {
+            buttons.forEach(function(btn) {
+                btn.classList.remove("active");
+            });
+            button.classList.add("active");
+        });
+    });
+
+    buttonFiltterGroup.classList.add("active"); // Устанавливаем класс active при загрузке страницы
+
+    buttonFiltterGroup.addEventListener("click", function(event) {
+        event.preventDefault(); // Отменяем действие по умолчанию (отправку формы)
+        filtterMol.style.display = "none";
+        filtterGroup.style.display = "block";
+        buttonFiltterMol.classList.remove("active");
+    });
+
+    buttonFiltterMol.addEventListener("click", function(event) {
+        event.preventDefault(); // Отменяем действие по умолчанию (отправку формы)
+        filtterGroup.style.display = "none";
+        filtterMol.style.display = "block";
+        buttonFiltterGroup.classList.remove("active");
+    });
+});
+</script>
+
+    <!-- ЗАМЕНА 0 НА НИЧТО -->
+<script>
+    function preventEmptyInput(input) {
+        if (input.value === "0") {
+            input.value = "";
+        }
+    }
+</script>
+
+<!-- ФИЛЬТРАЦИЯ -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    var sendRequest;
+    var value = 0; // объявляем переменную в глобальной области
+    var isScrolling = false;
+
+    function hideResultAndOverlay() {
+        const resultContainer = document.getElementById('resultContainer1');
+        const overlay = document.getElementById('overlay');
+        resultContainer.style.display = 'none';
+        overlay.style.display = 'none';
+    }
+    $(document).ready(function() {
+        sendRequest = function() {
+            console.log('()()()()()()()()()()Значение переменной value:', value);
+            var userIdElement = document.getElementById('userIdValue');
+            var userId = parseInt(userIdElement.getAttribute('data-userid'));
+            $.ajax({
+                type: 'POST',
+                url: '{% url "homepage" %}',
+                data: $('#Filtration').serialize() + '&value=' + value + '&userId=' + userId, //отправляет
+                success: function(response) {
+                    response.results.forEach(function(result) {
+                        if (result.type === "cas") {
+                            var container = $('<div class="result-filtr"></div>');
+
+                            for (var i = 0; i < result.value.length; i++) {
+                                var casValue = response.results.find(item => item.type === "cas").value[i];
+                                var nameValue = response.results.find(item => item.type === "name").value[i];
+                                var formulaValue = response.results.find(item => item.type === "formula").value[i];
+                                var metodyValue = response.results.find(item => item.type === "metody").value[i];
+                                var favoritesValue = response.results.find(item => item.type === "favorites").value[i];
+                                console.log('casValue:', casValue);
+                                console.log('favoritesValue:', favoritesValue);
+
+                                var innerContainer = $('<form class="plitki" onsubmit="return submitForm(this)"></form>');
+                                var button = $('<button type="submit" class="plitki-button" onclick="hideResultAndOverlay()"></button>');
+                                var input = $('<input type="hidden" id="cas_search' + (i + 1) + '" value="' + casValue + '">');
+                                var chec = $('<label class="checkbox style-f2"></label>');
+                                var text = $('<div class="text-infa"></div>');
+                                innerContainer.append(button);
+                                innerContainer.append(chec);
+                                innerContainer.append(input);
+                                button.append($('<img src="/media/photos/' + casValue + '.png" class="result-image2">'));
+                                button.append(text)
+                                text.append($('<div><b>CAS:</b> ' + casValue + '</div>'));
+                                text.append($('<div><b>Название:</b> ' + nameValue + '</div>'));
+                                text.append($('<div><b>Брутто-формула:</b> ' + formulaValue + '</div>'));
+                                text.append($('<div><b>Методы расчётов:</b> ' + metodyValue + '</div>'));
+
+                                var favoritesCheckbox1 = $('<input type="checkbox" name="' + casValue + '" class="favorites-checkbox">');
+                                var favoritesCheckbox2 = $('<div class="checkbox__checkmark"></div>');
+
+                                if (casValue[0] === favoritesValue[0]) {
+                                    favoritesCheckbox1.prop('checked', true);
+                                    var favoritesCheckbox3 = $('<div class="checkbox__body">В избранном</div>');
+                                } else{
+                                    var favoritesCheckbox3 = $('<div class="checkbox__body">В избранное</div>');
+                                }
+                                chec.append(favoritesCheckbox1);
+                                chec.append(favoritesCheckbox2);
+                                chec.append(favoritesCheckbox3);
+
+
+                                container.append(innerContainer);
+                            }
+
+
+                            $('#resultContainer1').append(container);
+                        }
+                    });
+                },
+                error: function(error) {
+                    console.error('Ошибка:', error);
+                }
+            });
+        }
+        sendRequest();
+
+        $('.submenu-checkbox').change(function() {
+            $('#resultContainer1').empty();
+            $('#Filtration').submit();
+        });
+
+        $('.submenu-number').change(function() {
+            $('#resultContainer1').empty();
+            $('#Filtration').submit();
+        });
+
+        $('#Filtration').submit(function(e) {
+            e.preventDefault();
+            value = 0;
+            console.log('()()()()()()()()()()Значение переменной value:', value);
+            sendRequest();
+        });
+
+        // Добавляем обработчик прокрутки контейнера
+        $('#resultContainer1').on('scroll', function() {
+            var container = $(this);
+            var containerHeight = container.innerHeight();
+            var scrollPosition = container.scrollTop();
+            var contentHeight = $('#resultContainer1')[0].scrollHeight;
+
+            // Добавляем небольшой запас, чтобы учесть погрешности при вычислениях
+            var buffer = 800;
+
+            console.log("Container Height:", containerHeight);
+            console.log("Scroll Position:", scrollPosition);
+            console.log("Content Height:", contentHeight);
+            // Проверяем, достиг ли скролл практически конца содержимого с небольшим запасом
+            if (scrollPosition + containerHeight >= contentHeight - buffer && !isScrolling) {
+                isScrolling = true;
+                value += 28; // увеличиваем значение на 20
+                sendRequest(); // вызываем функцию с новым значением
+
+                // Установка задержки перед снова разрешить выполнение
+                setTimeout(function() {
+                    isScrolling = false;
+                }, 1000); // 1000 миллисекунд = 1 секунда
+            }
+        });
+    });
+    function resetFilters() {
+        value = 0;
+        $('#resultContainer1').empty(); // Очистка контейнера
+        var checkboxes = document.querySelectorAll('.submenu-checkbox');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = false;
+        });
+
+        var numberInputs = document.querySelectorAll('.submenu-number');
+        numberInputs.forEach(function(input) {
+            input.value = '';
+        });
+
+        sendRequest();
+    }
+
+    document.getElementById('reset-filters').addEventListener('click', function() {
+        resetFilters();
+    });
+
+</script>
+
+
+
+
+
+
+
+
+    <!-- ПОКАЗ И СКРЫТИЕ МЕНЮ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menu = document.getElementById('menu');
+        const resultContainer = document.getElementById('resultContainer1');
+        const overlay = document.getElementById('overlay');
+
+        menu.addEventListener('mouseenter', function() {
+            resultContainer.style.display = 'block';
+            overlay.style.display = 'block';
+        });
+
+        menu.addEventListener('mouseleave', function() {
+            hideResultAndOverlay();
+        });
+
+        resultContainer.addEventListener('mouseleave', function() {
+            hideResultAndOverlay();
+        });
+
+        document.addEventListener('mouseleave', function(event) {
+            const e = event.toElement || event.relatedTarget;
+            if (e && (e.parentNode == menu || e == menu)) {
+                return;
+            }
+            hideResultAndOverlay();
+        });
+
+        resultContainer.addEventListener('mouseenter', function() {
+            resultContainer.style.display = 'block';
+            overlay.style.display = 'block';
+        });
+
+        resultContainer.addEventListener('mouseleave', function() {
+            hideResultAndOverlay();
+        });
+
+        function hideResultAndOverlay() {
+            resultContainer.style.display = 'none';
+            overlay.style.display = 'none';
+        }
+    });
+
+</script>
+
+
+
+
+<!-- ПОИСК -->
+<script>
+function submitForm(form) {
+    if (!isStuff) {
+    document.getElementById("auth-message-container").style.display = "block";
+    return false;
+    }
+    var searchQuery = document.getElementById('search_query').value.replace(/\s+/g, '');
+    var casSearchElement = form.querySelector('[id^="cas_search"]'); // Находим элемент формы внутри переданной формы
+    var casSearchValue = casSearchElement ? casSearchElement.value.replace(/\s+/g, '') : null; // Получаем значение этого элемента, если он найден
+    var userIdElement = document.getElementById('userIdValue');
+    var userId = parseInt(userIdElement.getAttribute('data-userid'));
+    var query = searchQuery || casSearchValue;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "{% url 'search_results' %}?search_query=" + encodeURIComponent(query) + "&userId=" + userId, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            var responseData = JSON.parse(xhr.responseText);
+            var resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = ''; // Clearing the content before adding new results
+
+            if (responseData.results_molecules.length === 0 && responseData.results_b3lyp.length === 0 && responseData.results_g3mp2.length === 0 && responseData.results_g4.length === 0 && responseData.results_m06.length === 0) {
+                var noResultsMessage = document.createElement('div');
+                noResultsMessage.textContent = "В базе данных отсутствует значение cas = " + query;
+                resultsContainer.appendChild(noResultsMessage);
+            } else {
+                // Displaying results for molecules and creating "Show/Hide" buttons if necessary
+                if (responseData.results_molecules && responseData.results_molecules.length > 0) {
+                    var moleculeResult = responseData.results_molecules[0]; // Первый результат, если есть
+                    var moleculeHTML = '<div class="result-container">';
+                    moleculeHTML += '<img src="/media/photos/' + moleculeResult[0] + '.png" class="result-image">';
+                    moleculeHTML += '<div class="result-text">';
+                    moleculeHTML += '<div>CAS: <span>' + moleculeResult[0] + '</span></div>';
+                    moleculeHTML += '<div>Название: <span>' + moleculeResult[2] + '</span></div>';
+                    moleculeHTML += '<div>Брутто-формула: <span>' + moleculeResult[1] + '</span></div>';
+                    moleculeHTML += '</div>'; // Закрываем div result-text
+                    moleculeHTML += '<label class="checkbox style-f"><input type="checkbox" name="' + moleculeResult[0] + '" class="favorites-checkbox"';
+
+                    // Проверяем, равны ли результат и избранное
+                    if (responseData.favorites && responseData.favorites.length > 0 &&
+                        responseData.results_molecules[0][0] === responseData.favorites[0][0]) {
+                        moleculeHTML += ' checked'; // Добавляем атрибут checked, если условие выполнено
+                        moleculeHTML += '/><div class="checkbox__checkmark"></div><div class="checkbox__body">В избранном</div></label>'; // Изменяем текст
+                    } else {
+                        moleculeHTML += '/><div class="checkbox__checkmark"></div><div class="checkbox__body">В избранное</div></label>'; // Оставляем оригинальный текст
+                    }
+
+                    moleculeHTML += '</div>'; // Закрываем div result-container
+
+                    var favoritesCheckbox = $('.favorites-checkbox[name="' + moleculeResult[0] + '"]');
+
+                    resultsContainer.innerHTML += moleculeHTML;
+                }
+
+
+
+
+                // Creating a container for toggle buttons
+                var toggleButtonsContainer = document.createElement('div');
+                toggleButtonsContainer.className = 'toggle-buttons-container';
+
+
+                // Displaying results for the b3lyp method and creating a "Show" button if necessary
+                if (responseData.results_b3lyp && responseData.results_b3lyp.length > 0) {
+                    var b3lypHTML = '<div class="result-table"><table id="b3lypTable" class="toggle-table">';
+                    var indexCounter = 1;
+                    b3lypHTML += '<tr><th>Индекс</th><th>Дата расчёта</th><th>Температура, К</th><th>Давление, атм</th><th>Free Energy, Hartree</th><th>Поправка по энтальпии</th><th>Поправка по энергии</th><th>dfH (GA), kJ/mol </th><th>Действия</th></tr>';
+                    responseData.results_b3lyp.forEach(function(result) {
+                        var dateStr = result[1].replace("T", " "); // Replacing "T" with a space
+                        b3lypHTML += '<tr><td>' + indexCounter + '</td><td>' + dateStr + '</td><td>' + result[2] + '</td><td>' + result[3] + '</td><td>' + result[4] + '</td><td>' + result[5] + '</td><td>' + result[6] + '</td><td>' + result[7] + '</td><td>';
+                        b3lypHTML += '<button class="action-button" onclick="show3D(\'' + result[0] + '\')"><img src="/media/photos/3DD.png" class="table-image"></button>';
+                        b3lypHTML += '<button class="action-button" onclick="compare()"><img src="/media/photos/comparison.png" class="table-image"></button>';
+                        b3lypHTML += '<button class="action-button" onclick="downloadCalculation(' + result[0] + ')"><img src="/media/photos/download.png" class="table-image"></button>';
+                        b3lypHTML += '</td></tr>';
+                        indexCounter++;
+                    });
+                    b3lypHTML += '</table></div>';
+
+                    // Creating a "Show" button for the b3lyp table
+                    var toggleButtonHTML = '<button class="toggleButton" onclick="toggleTable(\'b3lypTable\')">Метод B3LUP</button>';
+                    toggleButtonsContainer.innerHTML += toggleButtonHTML;
+
+                    resultsContainer.innerHTML += b3lypHTML;
+                }
+
+                // Displaying results for the g3mp2 method and creating a "Show" button if necessary
+                if (responseData.results_g3mp2 && responseData.results_g3mp2.length > 0) {
+                    var g3mp2HTML = '<div class="result-table"><table id="g3mp2Table" class="toggle-table">';
+                    g3mp2HTML += '<tr><th>Индекс</th><th>Дата расчёта</th><th>Температура, К</th><th>Давление, атм</th><th>Free Energy, Hartree</th><th>Enthalpy, Hartree</th><th>dfH (GA), kJ/mol </th><th>dfH (AT), kJ/mol</th><th>S, J/molK</th><th>Действия</th></tr>';
+                    var indexCounter = 1;
+                    responseData.results_g3mp2.forEach(function(result) {
+                        var dateStr = result[1].replace("T", " "); // Replacing "T" with a space
+                        g3mp2HTML += '<tr><td>' + indexCounter + '</td><td>' + dateStr + '</td><td>' + result[2] + '</td><td>' + result[3] + '</td><td>' + result[4] + '</td><td>' + result[5] + '</td><td>' + result[6] + '</td><td>' + result[7] + '</td><td>' + result[8] + '</td><td>';
+                        g3mp2HTML += '<button class="action-button" onclick="show3D(\'' + result[0] + '\')"><img src="/media/photos/3DD.png" class="table-image"></button>';
+                        g3mp2HTML += '<button class="action-button" onclick="compare()"><img src="/media/photos/comparison.png" class="table-image"></button>';
+                        g3mp2HTML += '<button class="action-button" onclick="downloadCalculation(' + result[0] + ')"><img src="/media/photos/download.png" class="table-image"></button>';
+                        g3mp2HTML += '</td></tr>';
+                        indexCounter++;
+                    });
+                    g3mp2HTML += '</table></div>';
+
+                    // Creating a "Show" button for the g3mp2 table
+                    var toggleButtonHTML = '<button class="toggleButton" onclick="toggleTable(\'g3mp2Table\')">Метод G3MP2</button>';
+                    toggleButtonsContainer.innerHTML += toggleButtonHTML;
+
+                    resultsContainer.innerHTML += g3mp2HTML;
+                }
+
+                // Displaying results for the g4 method and creating a "Show" button if necessary
+                if (responseData.results_g4 && responseData.results_g4.length > 0) {
+                    var g4HTML = '<div class="result-table"><table id="g4Table" class="toggle-table">';
+                    g4HTML += '<tr><th>Индекс</th><th>Дата расчёта</th><th>Температура, К</th><th>Давление, атм</th><th>Free Energy, Hartree</th><th>Enthalpy, Hartree</th><th>dfH (GA), kJ/mol </th><th>dfH (AT), kJ/mol</th><th>S, J/molK</th><th>Действия</th></tr>';
+                    var indexCounter = 1;
+                    responseData.results_g4.forEach(function(result) {
+                        var dateStr = result[1].replace("T", " "); // Replacing "T" with a space
+                        g4HTML += '<tr><td>' + indexCounter + '</td><td>' + dateStr + '</td><td>' + result[2] + '</td><td>' + result[3] + '</td><td>' + result[4] + '</td><td>' + result[5] + '</td><td>' + result[6] + '</td><td>' + result[7] + '</td><td>' + result[8] + '</td><td>';
+                        g4HTML += '<button class="action-button" onclick="show3D(\'' + result[0] + '\')"><img src="/media/photos/3DD.png" class="table-image"></button>';
+                        g4HTML += '<button class="action-button" onclick="compare()"><img src="/media/photos/comparison.png" class="table-image"></button>';
+                        g4HTML += '<button class="action-button" onclick="downloadCalculation(' + result[0] + ')"><img src="/media/photos/download.png" class="table-image"></button>';
+                        g4HTML += '</td></tr>';
+                        indexCounter++;
+                    });
+                    g4HTML += '</table></div>';
+
+                    // Creating a "Show" button for the g4 table
+                    var toggleButtonHTML = '<button class="toggleButton" onclick="toggleTable(\'g4Table\')">Метод G4</button>';
+                    toggleButtonsContainer.innerHTML += toggleButtonHTML;
+
+                    resultsContainer.innerHTML += g4HTML;
+                }
+
+                // Displaying results for the m06 method and creating a "Show" button if necessary
+                if (responseData.results_m06 && responseData.results_m06.length > 0) {
+                    var m06HTML = '<div class="result-table"><table id="m06Table" class="toggle-table">';
+                    var indexCounter = 1;
+                    m06HTML += '<tr><th>Индекс</th><th>Дата расчёта</th><th>Температура, К</th><th>Давление, атм</th><th>Free Energy, Hartree</th><th>Поправка по энтальпии</th><th>Поправка по энергии</th><th>dfH (GA), kJ/mol </th><th>Действия</th></tr>';
+                    responseData.results_m06.forEach(function(result) {
+                        var dateStr = result[1].replace("T", " "); // Replacing "T" with a space
+                        m06HTML += '<tr><td>' + indexCounter + '</td><td>' + dateStr + '</td><td>' + result[2] + '</td><td>' + result[3] + '</td><td>' + result[4] + '</td><td>' + result[5] + '</td><td>' + result[6] + '</td><td>' + result[7] + '</td><td>';
+                        m06HTML += '<button class="action-button" onclick="show3D(\'' + result[0] + '\')"><img src="/media/photos/3DD.png" class="table-image"></button>';
+                        m06HTML += '<button class="action-button" onclick="compare()"><img src="/media/photos/comparison.png" class="table-image"></button>';
+                        m06HTML += '<button class="action-button" onclick="downloadCalculation(' + result[0] + ')"><img src="/media/photos/download.png" class="table-image"></button>';
+                        m06HTML += '</td></tr>';
+                        indexCounter++;
+                    });
+                    m06HTML += '</table></div>';
+
+                    // Creating a "Show" button for the m06 table
+                    var toggleButtonHTML = '<button class="toggleButton" onclick="toggleTable(\'m06Table\')">Метод M06</button>';
+                    toggleButtonsContainer.innerHTML += toggleButtonHTML;
+
+                    resultsContainer.innerHTML += m06HTML;
+                }
+
+                // Adding the toggle buttons container after the result container
+                var resultContainer = document.querySelector('.result-container');
+                resultContainer.parentNode.insertBefore(toggleButtonsContainer, resultContainer.nextSibling);
+
+                // Show the first table
+                var firstTable = document.querySelector('.toggle-table');
+                if (firstTable) {
+                    firstTable.style.display = 'table';
+                }
+            }
+
+            document.getElementById('search_query').value = '';
+        } else {
+            console.error(xhr.statusText);
+        }
+    };
+    xhr.send();
+    return false; // to prevent the default form submission
+}
+
+
+
+    function toggleTable(tableId) {
+        var tables = document.querySelectorAll('.toggle-table'); // Получаем все таблицы с классом toggle-table
+        for (var i = 0; i < tables.length; i++) {
+            tables[i].style.display = 'none'; // Скрываем все таблицы
+        }
+
+        var tableToShow = document.getElementById(tableId);
+        tableToShow.style.display = 'table'; // Показываем таблицу, соответствующую нажатой кнопке
+    }
+    function show3D(value) {
+
+            // Отправьте запрос на сервер с использованием Ajax
+            $.ajax({
+                url: '/molecule-viewer/' + value + '/',
+                type: 'GET',
+                success: function(data) {
+                    // Откройте новое окно или вкладку с полученным HTML
+                    var newWindow = window.open('', '_blank');
+                    newWindow.document.write(data);
+                    newWindow.document.close();
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+    function favorites(value) {
+    // Действия при нажатии кнопки "Добавить в избранное"
+        }
+
+    function compare() {
+        // Действия при нажатии кнопки "Сравнение"
+    }
+
+async function downloadCalculation(raschety_id) {
+    try {
+        // Выполняем GET-запрос к серверу для скачивания файла
+        const response = await fetch(`/download-specific-file/${raschety_id}/`);
+
+        // Проверяем успешность запроса
+        if (!response.ok) {
+            // Если запрос не успешен, выбрасываем ошибку с соответствующим статусом
+            throw new Error(`Download failed. Status: ${response.status}`);
+        }
+
+        // Получаем имя файла из заголовка Content-Disposition
+        let filename = 'download';
+        const disposition = response.headers.get('Content-Disposition');
+        if (disposition && disposition.indexOf('attachment') !== -1) {
+            const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
+            if (matches != null && matches[1]) {
+                filename = matches[1].replace(/['"]/g, '');
+            }
+        }
+
+        // Получаем двоичные данные файла
+        const blob = await response.blob();
+
+        // Создаем URL для объекта Blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Создаем элемент 'a' для скачивания файла
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename; // Устанавливаем имя файла для скачивания
+
+        // Скрыто добавляем элемент 'a' в тело документа
+        a.style.display = 'none';
+        document.body.appendChild(a);
+
+        // Производим клик по элементу 'a', чтобы начать скачивание файла
+        a.click();
+
+        // Освобождаем URL, созданный для объекта Blob
+        window.URL.revokeObjectURL(url);
+
+        // Удаляем элемент 'a' из документа после завершения скачивания файла
+        document.body.removeChild(a);
+    } catch (error) {
+        // Обрабатываем любые ошибки, которые могут возникнуть при выполнении запроса
+        console.error(error);
+    }
+}
+
+</script>
+
+<!-- СЛЕЖКА ЗА ПОДЛЫМИ ЧЕКБОКСАМИ ИЗБРАННОГО -->
+<script>
+$(document).ready(function(){
+    $(document).on('change', '.favorites-checkbox', function(){
+        var checkboxName = $(this).attr('name');
+        var isChecked = $(this).is(':checked') ? 1 : 2;
+        var userIdElement = document.getElementById('userIdValue');
+        var userId = parseInt(userIdElement.getAttribute('data-userid'));
+        var csrftoken = getCookie('csrftoken'); // Получаем CSRF-токен из куки
+
+        $.ajax({
+            url: '{% url "check" %}',
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken }, // Включаем CSRF-токен в заголовок
+            data: { name: checkboxName, state: isChecked, userId: userId },
+            success: function(response){
+                // Обработка успешного ответа
+            },
+            error: function(xhr, status, error){
+                console.error(error);
+            }
+        });
+    });
+});
+
+// Функция для получения CSRF-токена из куки
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+</script>
+<script>
+    // Получаем ссылку на чекбокс
+document.addEventListener('change', function(event) {
+    var target = event.target;
+    if (target && target.matches('.favorites-checkbox')) {
+        var label = target.closest('label');
+        var textElement = label.querySelector('.checkbox__body');
+
+        if (target.checked) {
+            textElement.textContent = 'В избранном';
+        } else {
+            textElement.textContent = 'В избранное';
+        }
+    }
+});
+
+</script>
+</body>
+</html>
+
+

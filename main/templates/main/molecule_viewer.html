@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'main/css/mol_view.css' %}">
+    <link href="https://fonts.cdnfonts.com/css/montserrat-alternates" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/montserrat" rel="stylesheet">
+    <title>3D Molecule Viewer</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://3dmol.org/build/3Dmol.js"></script>
+</head>
+
+<body onload="createMoleculeViewer(false)">
+    <!-- Шапка -->
+    <div class="header">
+        <div id="title">Database<br>Quantum chemical calculations</div>
+            <div id="checkboxes">
+                <div class="checkbox-wrapper-49">
+                  <label class="switch" for="cheap-1">
+                    <input id="cheap-1" type="checkbox" name="0" class="submenu-checkbox" onchange="toggleNumbering()" />
+                    <div class="slider round"></div>
+                    <span class="checkbox-text">Нумерация</span>
+                  </label>
+                </div>
+
+                <div class="checkbox-wrapper-49">
+                  <label class="switch" for="cheap-2">
+                    <input id="cheap-2" type="checkbox" name="0" class="submenu-checkbox" onchange="toggleContainer('groups-data-container', this.checked)" />
+                    <div class="slider round"></div>
+                    <span class="checkbox-text">Группы</span>
+                  </label>
+                </div>
+
+                <div class="checkbox-wrapper-49">
+                  <label class="switch" for="cheap-3">
+                    <input id="cheap-3" type="checkbox" name="0" class="submenu-checkbox" onchange="toggleContainer('legend-container', this.checked)" />
+                    <div class="slider round"></div>
+                    <span class="checkbox-text">Легенда</span>
+                  </label>
+                </div>
+            </div>
+    </div>
+
+    <div id="groups-data-container">
+        <table class="groups-data-table">
+            <tr>
+                <th>Номер атома</th>
+                <th>Группа</th>
+            </tr>
+            {% for group in groups_data %}
+            <tr>
+                <td>{{ group.number_atom }}</td>
+                <td>{{ group.groups }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- Создание общего контейнера -->
+    <div class="content">
+        <!-- Создание контейнера для отображения 3D-модели молекулы с рамкой -->
+        <div id="molecule-viewer-container">
+            <div id="molecule-viewer"></div>
+            <!-- Легенда -->
+            <div id="legend-container" class="legend-container">
+                {% for element in unique_elements %}
+                <div class="legend-item">
+                    <div class="color-sphere" style="background: {{element.color}}"></div>
+                    <span class="dash"> - </span>
+                    <span class="atom-name">{{ element.name }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+<script>
+    var moleculeData = {{ molecule_data | safe }};
+    var numberingVisible = false;
+    var moleculeViewer = null;
+
+    function toggleNumbering() {
+        numberingVisible = !numberingVisible;
+        clearView();
+        createMoleculeViewer(numberingVisible);
+    }
+
+    function clearView() {
+        if (moleculeViewer !== null) {
+            moleculeViewer.removeAllModels();
+            moleculeViewer = null;
+        }
+    }
+
+    function createMoleculeViewer(showNumbering) {
+        moleculeViewer = $3Dmol.createViewer('molecule-viewer', {
+            backgroundColor: '#F9FAFE',
+            width: 1200,
+            height: 650
+        });
+
+        for (var i = 0; i < moleculeData.coords.length; i++) {
+            var atom = moleculeData.coords[i];
+            var color = moleculeData.atom_colors[i];
+            var atomNumber = moleculeData.atom_numbers[i];
+
+            moleculeViewer.addSphere({
+                center: {
+                    x: atom[0],
+                    y: atom[1],
+                    z: atom[2]
+                },
+                radius: 0.30,
+                color: color,
+                clickable: true
+            });
+
+            if (showNumbering) {
+                moleculeViewer.addLabel(atomNumber.toString(), {
+                    position: {
+                        x: atom[0],
+                        y: atom[1],
+                        z: atom[2]
+                    },
+                    backgroundColor: 'black',
+                    fontColor: 'white',  // Цвет текста
+                    fontSize: 18,        // Размер текста
+                    font: 'Arial'        // Шрифт текста
+                });
+            }
+        }
+
+        for (var i = 0; i < moleculeData.bonds.length; i++) {
+            var bond = moleculeData.bonds[i];
+            var atom1 = moleculeData.coords[bond.start];
+            var atom2 = moleculeData.coords[bond.end];
+            var bondType = bond.type;
+
+            // Отрисовка основной связи
+            var mainCylinder = moleculeViewer.addCylinder({
+                start: {x: atom1[0], y: atom1[1], z: atom1[2]},
+                end: {x: atom2[0], y: atom2[1], z: atom2[2]},
+                radius: 0.13, color: 'grey'
+            });
+
+            // Проверка типа связи
+            if (bondType === 3) {
+                var blackx= (atom1[0]+atom2[0])/2;
+                var blacky = (atom1[1]+atom2[1])/2;
+                var blackz = (atom1[2]+atom2[2])/2;
+
+                var direction = [atom2[0] - atom1[0], atom2[1] - atom1[1], atom2[2] - atom1[2]];
+
+                var length = Math.sqrt(direction[0] ** 2 + direction[1] ** 2 + direction[2] ** 2);
+                var unitDirection = [direction[0] / length, direction[1] / length, direction[2] / length];
+
+                var perpendicularDirection = [unitDirection[1], -unitDirection[0], 0];  // Example perpendicular direction
+                var perpLength = 1.1;  // Length of the perpendicular cylinder
+
+
+                var center_x = blackx + perpLength * perpendicularDirection[0];
+                var center_y = blacky + perpLength * perpendicularDirection[1];
+                var center_z = blackz + perpLength * perpendicularDirection[2];
+
+                var blackSphere1_x = atom1[0] + (atom2[0] - atom1[0]) / 8;
+                var blackSphere1_y = atom1[1] + (atom2[1] - atom1[1]) / 8;
+                var blackSphere1_z = atom1[2] + (atom2[2] - atom1[2]) / 8;
+
+                var blackSphere2_x = atom1[0] + (atom2[0] - atom1[0]) * 7 / 8;
+                var blackSphere2_y = atom1[1] + (atom2[1] - atom1[1]) * 7 / 8;
+                var blackSphere2_z = atom1[2] + (atom2[2] - atom1[2]) * 7 / 8;
+
+                // Определяем координаты для розовых шаров на 7/8 от центра цикла
+                var pinkSphere1_x = blackSphere1_x + (center_x - blackSphere1_x) * 2.5 / 8;
+                var pinkSphere1_y = blackSphere1_y + (center_y - blackSphere1_y) * 2.5 / 8;
+                var pinkSphere1_z = blackSphere1_z + (center_z - blackSphere1_z) * 2.5 / 8;
+
+                var pinkSphere2_x = blackSphere2_x + (center_x - blackSphere2_x) * 2.5 / 8;
+                var pinkSphere2_y = blackSphere2_y + (center_y - blackSphere2_y) * 2.5 / 8;
+                var pinkSphere2_z = blackSphere2_z + (center_z - blackSphere2_z) * 2.5 / 8;
+
+                moleculeViewer.addCylinder({
+                    start: {x: pinkSphere1_x, y: pinkSphere1_y, z: pinkSphere1_z},
+                    end: {x: pinkSphere2_x, y: pinkSphere2_y, z: pinkSphere2_z},
+                    radius: 0.1, color: 'grey'
+                });
+                 moleculeViewer.addSphere({center: {x: pinkSphere1_x, y: pinkSphere1_y, z: pinkSphere1_z}, radius: 0.1, color: 'grey'});
+                 moleculeViewer.addSphere({center: {x: pinkSphere2_x, y: pinkSphere2_y, z: pinkSphere2_z}, radius: 0.1, color: 'grey'});
+
+
+
+                var center_x = blackx - perpLength * perpendicularDirection[0];
+                var center_y = blacky - perpLength * perpendicularDirection[1];
+                var center_z = blackz - perpLength * perpendicularDirection[2];
+
+                var blackSphere1_x = atom1[0] + (atom2[0] - atom1[0]) / 8;
+                var blackSphere1_y = atom1[1] + (atom2[1] - atom1[1]) / 8;
+                var blackSphere1_z = atom1[2] + (atom2[2] - atom1[2]) / 8;
+
+                var blackSphere2_x = atom1[0] + (atom2[0] - atom1[0]) * 7 / 8;
+                var blackSphere2_y = atom1[1] + (atom2[1] - atom1[1]) * 7 / 8;
+                var blackSphere2_z = atom1[2] + (atom2[2] - atom1[2]) * 7 / 8;
+
+                // Определяем координаты для розовых шаров на 7/8 от центра цикла
+                var pinkSphere1_x = blackSphere1_x + (center_x - blackSphere1_x) * 2.5 / 8;
+                var pinkSphere1_y = blackSphere1_y + (center_y - blackSphere1_y) * 2.5 / 8;
+                var pinkSphere1_z = blackSphere1_z + (center_z - blackSphere1_z) * 2.5 / 8;
+
+                var pinkSphere2_x = blackSphere2_x + (center_x - blackSphere2_x) * 2.5 / 8;
+                var pinkSphere2_y = blackSphere2_y + (center_y - blackSphere2_y) * 2.5 / 8;
+                var pinkSphere2_z = blackSphere2_z + (center_z - blackSphere2_z) * 2.5 / 8;
+
+                moleculeViewer.addCylinder({
+                    start: {x: pinkSphere1_x, y: pinkSphere1_y, z: pinkSphere1_z},
+                    end: {x: pinkSphere2_x, y: pinkSphere2_y, z: pinkSphere2_z},
+                    radius: 0.1, color: 'grey'
+                });
+                 moleculeViewer.addSphere({center: {x: pinkSphere1_x, y: pinkSphere1_y, z: pinkSphere1_z}, radius: 0.1, color: 'grey'});
+                    moleculeViewer.addSphere({center: {x: pinkSphere2_x, y: pinkSphere2_y, z: pinkSphere2_z}, radius: 0.1, color: 'grey'});
+
+
+            } else if (bondType === 2) {
+                // Проверяем, является ли один из атомов в цикле
+                var atom1_in_cycle = moleculeData.cycle_info[bond.start];
+                var atom2_in_cycle = moleculeData.cycle_info[bond.end];
+
+                // Проверка наличия атомов в цикле
+                if (atom1_in_cycle && atom2_in_cycle) {
+                    // Если атомы в цикле присутствуют, находим центр цикла
+                    var center_x, center_y, center_z;
+                    for (var j = 0; j < moleculeData.cycle_centers.length; j++) {
+                        if (moleculeData.cycle_centers[j].number_cycle === atom1_in_cycle || moleculeData.cycle_centers[j].number_cycle === atom2_in_cycle) {
+                            center_x = moleculeData.cycle_centers[j].center_x;
+                            center_y = moleculeData.cycle_centers[j].center_y;
+                            center_z = moleculeData.cycle_centers[j].center_z;
+                            break;
+                        }
+                    }
+
+                    // Определяем координаты для чёрных шаров на 1/4 и 3/4 длины основной связи
+                    var blackSphere1_x = atom1[0] + (atom2[0] - atom1[0]) / 8;
+                    var blackSphere1_y = atom1[1] + (atom2[1] - atom1[1]) / 8;
+                    var blackSphere1_z = atom1[2] + (atom2[2] - atom1[2]) / 8;
+
+                    var blackSphere2_x = atom1[0] + (atom2[0] - atom1[0]) * 7 / 8;
+                    var blackSphere2_y = atom1[1] + (atom2[1] - atom1[1]) * 7 / 8;
+                    var blackSphere2_z = atom1[2] + (atom2[2] - atom1[2]) * 7 / 8;
+
+                    // Определяем координаты для розовых шаров на 7/8 от центра цикла
+                    var pinkSphere1_x = blackSphere1_x + (center_x - blackSphere1_x) * 2 / 8;
+                    var pinkSphere1_y = blackSphere1_y + (center_y - blackSphere1_y) * 2 / 8;
+                    var pinkSphere1_z = blackSphere1_z + (center_z - blackSphere1_z) * 2 / 8;
+
+                    var pinkSphere2_x = blackSphere2_x + (center_x - blackSphere2_x) * 2 / 8;
+                    var pinkSphere2_y = blackSphere2_y + (center_y - blackSphere2_y) * 2 / 8;
+                    var pinkSphere2_z = blackSphere2_z + (center_z - blackSphere2_z) * 2 / 8;
+
+                    moleculeViewer.addCylinder({
+                        start: {x: pinkSphere1_x, y: pinkSphere1_y, z: pinkSphere1_z},
+                        end: {x: pinkSphere2_x, y: pinkSphere2_y, z: pinkSphere2_z},
+                        radius: 0.1, color: 'grey'
+                    });
+                    // Добавление розовых шаров на 7/8 от центра цикла
+                    moleculeViewer.addSphere({center: {x: pinkSphere1_x, y: pinkSphere1_y, z: pinkSphere1_z}, radius: 0.1, color: 'grey'});
+                    moleculeViewer.addSphere({center: {x: pinkSphere2_x, y: pinkSphere2_y, z: pinkSphere2_z}, radius: 0.1, color: 'grey'});
+                } else {
+                    var blackx= (atom1[0]+atom2[0])/2;
+                    var blacky = (atom1[1]+atom2[1])/2;
+                    var blackz = (atom1[2]+atom2[2])/2;
+
+                    var direction = [atom2[0] - atom1[0], atom2[1] - atom1[1], atom2[2] - atom1[2]];
+
+                    var length = Math.sqrt(direction[0] ** 2 + direction[1] ** 2 + direction[2] ** 2);
+                    var unitDirection = [direction[0] / length, direction[1] / length, direction[2] / length];
+
+                    var perpendicularDirection = [unitDirection[1], -unitDirection[0], 0];  // Example perpendicular direction
+                    var perpLength = 1.1;  // Length of the perpendicular cylinder
+
+
+                    var center_x = blackx + perpLength * perpendicularDirection[0];
+                    var center_y = blacky + perpLength * perpendicularDirection[1];
+                    var center_z = blackz + perpLength * perpendicularDirection[2];
+
+                    var blackSphere1_x = atom1[0] + (atom2[0] - atom1[0]) / 8;
+                    var blackSphere1_y = atom1[1] + (atom2[1] - atom1[1]) / 8;
+                    var blackSphere1_z = atom1[2] + (atom2[2] - atom1[2]) / 8;
+
+                    var blackSphere2_x = atom1[0] + (atom2[0] - atom1[0]) * 7 / 8;
+                    var blackSphere2_y = atom1[1] + (atom2[1] - atom1[1]) * 7 / 8;
+                    var blackSphere2_z = atom1[2] + (atom2[2] - atom1[2]) * 7 / 8;
+
+                    // Определяем координаты для розовых шаров на 7/8 от центра цикла
+                    var pinkSphere1_x = blackSphere1_x + (center_x - blackSphere1_x) * 3 / 8;
+                    var pinkSphere1_y = blackSphere1_y + (center_y - blackSphere1_y) * 3 / 8;
+                    var pinkSphere1_z = blackSphere1_z + (center_z - blackSphere1_z) * 3 / 8;
+
+                    var pinkSphere2_x = blackSphere2_x + (center_x - blackSphere2_x) * 3 / 8;
+                    var pinkSphere2_y = blackSphere2_y + (center_y - blackSphere2_y) * 3 / 8;
+                    var pinkSphere2_z = blackSphere2_z + (center_z - blackSphere2_z) * 3 / 8;
+
+                    moleculeViewer.addCylinder({
+                        start: {x: pinkSphere1_x, y: pinkSphere1_y, z: pinkSphere1_z},
+                        end: {x: pinkSphere2_x, y: pinkSphere2_y, z: pinkSphere2_z},
+                        radius: 0.1, color: 'grey'
+                    });
+                     moleculeViewer.addSphere({center: {x: pinkSphere1_x, y: pinkSphere1_y, z: pinkSphere1_z}, radius: 0.1, color: 'grey'});
+                     moleculeViewer.addSphere({center: {x: pinkSphere2_x, y: pinkSphere2_y, z: pinkSphere2_z}, radius: 0.1, color: 'grey'});
+
+
+                }
+            }
+        }
+
+        moleculeViewer.zoomTo();
+        moleculeViewer.render();
+    }
+
+    function toggleContainer(containerId, isChecked) {
+        var container = document.getElementById(containerId);
+
+        if (isChecked) {
+            container.style.display = 'flex';
+        } else {
+            container.style.display = 'none';
+        }
+    }
+
+    // Показ стрелочек
+
+    // Initially hide the containers
+
+    document.getElementById('groups-data-container').style.display = 'none';
+    document.getElementById('legend-container').style.display = 'none';
+
+</script>
+
+</body>
+
+</html>

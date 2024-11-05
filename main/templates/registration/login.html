@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/registration.css' %}">
+    <title>Авторизация</title>
+</head>
+<body>
+<div class="wrapper">
+    <h2>Авторизоваться</h2>
+    <form action="#" method="post">
+        {% csrf_token %}
+        <div class="input-box">
+            <input type="text" name="username" id="userName" placeholder="Введите имя пользователя" required>
+        </div>
+        <div class="input-box">
+            <input type="password" name="password" id="pwd" placeholder="Пароль" required>
+        </div>
+        <div class="policy">
+            <input type="checkbox">
+            <h3>Я согласен на обработку персональных данных</h3>
+        </div>
+        <div
+        <h3><a href="{% url 'custom_password_reset' %}">Забыли пароль?</a></h3>
+        </div>
+        <div class="input-box button">
+            <input type="submit" value="Вход">
+        </div>
+        <div class="text">
+            <h3>У вас еще нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь здесь</a></h3>
+            {{ form.errors }}
+        </div>
+    </form>
+</div>
+</body>
+</html>
